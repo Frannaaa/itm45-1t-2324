@@ -41,7 +41,15 @@ def relationship_status(from_member, to_member, social_graph):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
+        return "friends"
+    elif to_member in social_graph[from_member]["following"]:
+        return "follower"
+    elif from_member in social_graph[to_member]["following"]:
+        return "followed by"
+    else:
+        return "no relationship"
+
 
 
 def tic_tac_toe(board):
@@ -70,7 +78,16 @@ def tic_tac_toe(board):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+     for i in range(len(board)):
+        if len(set(board[i])) == 1 and board[i][0] != '':
+            return board[i][0]
+        if len(set([board[j][i] for j in range(len(board))])) == 1 and board[0][i] != '':
+            return board[0][i]
+    if len(set([board[i][i] for i in range(len(board))])) == 1 and board[0][0] != '':
+        return board[0][0]
+    if len(set([board[i][len(board)-1-i] for i in range(len(board))])) == 1 and board[0][len(board)-1] != '':
+        return board[0][len(board)-1]
+    return "NO WINNER"
 
 def eta(first_stop, second_stop, route_map):
     '''ETA. 
@@ -103,4 +120,9 @@ def eta(first_stop, second_stop, route_map):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+     time = 0
+    start = first_stop
+    while start != second_stop:
+        time += route_map[start, route_map[start].keys()[0]]['travel_time_mins']
+        start = route_map[start].keys()[0]
+    return time
