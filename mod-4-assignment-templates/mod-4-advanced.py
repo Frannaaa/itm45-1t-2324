@@ -41,14 +41,17 @@ def relationship_status(from_member, to_member, social_graph):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
+ def relationship_status(from_member, to_member, social_graph):
+    follows = to_member in social_graph[from_member]["following"]
+    followed_by = from_member in social_graph[to_member]["following"]
+    
+    if follows and followed_by:
         return "friends"
-    elif to_member in social_graph[from_member]["following"]:
+    elif follows:
         return "follower"
-    elif from_member in social_graph[to_member]["following"]:
+    elif followed_by:
         return "followed by"
-    else:
-        return "no relationship"
+    return "no relationship"
 
 
 
@@ -120,9 +123,14 @@ def eta(first_stop, second_stop, route_map):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-     time = 0
-    start = first_stop
-    while start != second_stop:
-        time += route_map[start, route_map[start].keys()[0]]['travel_time_mins']
-        start = route_map[start].keys()[0]
+    time = 0
+    current_stop = first_stop
+
+    while current_stop != second_stop:
+        for next_stop, details in route_map.items():
+            if next_stop[0] == current_stop:
+                time += details['travel_time_mins']
+                current_stop = next_stop[1]
+                break
+
     return time
