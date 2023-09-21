@@ -33,7 +33,6 @@ def savings(gross_pay, tax_rate, expenses):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    def savings(gross_pay, tax_rate, expenses):
     tax_amount = int(gross_pay * tax_rate)
     take_home_pay = gross_pay - tax_amount - expenses
     return take_home_pay
@@ -69,7 +68,6 @@ def material_waste(total_material, material_units, num_jobs, job_consumption):
     str
         the amount of remaining material expressed with its unit (e.g., "10kg").
     '''
-   def material_waste(total_material, material_units, num_jobs, job_consumption):
     total_consumed = num_jobs * job_consumption
     remaining_material = total_material - total_consumed
     return str(remaining_material) + material_units
@@ -102,7 +100,6 @@ def interest(principal, rate, periods):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    def interest(principal, rate, periods):
     simple_interest = principal * rate * periods
     final_value = principal + simple_interest
     return int(final_value)
@@ -137,7 +134,6 @@ def body_mass_index(weight, height):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    def body_mass_index(weight, height):
     weight_kg = weight * 0.453592
     total_inches = height[0] * 12 + height[1]
     height_m = total_inches * 0.0254
