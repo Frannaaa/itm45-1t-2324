@@ -44,17 +44,18 @@ def relationship_status(from_member, to_member, social_graph):
     follows = to_member in social_graph[from_member]["following"]
     followed_by = from_member in social_graph[to_member]["following"]
     
- if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
+    #if they follow each other
+    if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
         return "friends"
-    #from_member follows to_member
+    #if from_member follows to_member
     elif to_member in social_graph[from_member]["following"]:
         return "follower"
-    #to_member follows from_member
+    #if to_member follows from_member
     elif from_member in social_graph[to_member]["following"]:
         return "followed by"
-    # If none of the above, they have no relationship
+    # if none of the above, no relationship
     else:
-        return "no relationship
+        return "no relationship"
 
 
 
