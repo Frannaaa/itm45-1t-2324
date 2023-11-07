@@ -44,13 +44,17 @@ def relationship_status(from_member, to_member, social_graph):
     follows = to_member in social_graph[from_member]["following"]
     followed_by = from_member in social_graph[to_member]["following"]
     
-    if follows and followed_by:
+ if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
         return "friends"
-    elif follows:
+    #from_member follows to_member
+    elif to_member in social_graph[from_member]["following"]:
         return "follower"
-    elif followed_by:
+    #to_member follows from_member
+    elif from_member in social_graph[to_member]["following"]:
         return "followed by"
-    return "no relationship"
+    # If none of the above, they have no relationship
+    else:
+        return "no relationship
 
 
 
@@ -80,15 +84,22 @@ def tic_tac_toe(board):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-     for i in range(len(board)):
-        if len(set(board[i])) == 1 and board[i][0] != '':
+     size = len(board)
+    
+    # Chek rows and columns
+    for i in range(size):
+        if len(set(board[i])) == 1 and board[i][0] != ' ':
             return board[i][0]
-        if len(set([board[j][i] for j in range(len(board))])) == 1 and board[0][i] != '':
+        if len(set([board[j][i] for j in range(size)])) == 1 and board[0][i] != ' ':
             return board[0][i]
-    if len(set([board[i][i] for i in range(len(board))])) == 1 and board[0][0] != '':
+    
+    # Check diagonals
+    if len(set([board[i][i] for i in range(size)])) == 1 and board[0][0] != ' ':
         return board[0][0]
-    if len(set([board[i][len(board)-1-i] for i in range(len(board))])) == 1 and board[0][len(board)-1] != '':
-        return board[0][len(board)-1]
+    if len(set([board[i][size - 1 - i] for i in range(size)])) == 1 and board[0][size - 1] != ' ':
+        return board[0][size - 1]
+    
+    # If no winner, return "NO WINNER"
     return "NO WINNER"
 
 def eta(first_stop, second_stop, route_map):
@@ -122,14 +133,29 @@ def eta(first_stop, second_stop, route_map):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    time = 0
-    current_stop = first_stop
-
-    while current_stop != second_stop:
-        for next_stop, details in route_map.items():
-            if next_stop[0] == current_stop:
-                time += details['travel_time_mins']
-                current_stop = next_stop[1]
-                break
-
-    return time
+     # Initialize the total travel time
+    travel_time = 0
+    
+    # Find starting leg
+    current_leg = next(((start, end) for (start, end) in route_map if start == first_stop), None)
+    
+    # If starting leg doesn't exist, return 0 bc cannot calculate ETA
+    if not current_leg:
+        return 0
+    
+    # Loop til second stop is reached
+    while current_leg[1] != second_stop:
+        # Add the travel time of the current leg
+        travel_time += route_map[current_leg]["travel_time_mins"]
+        
+        # Move to next leg
+        current_leg = next(((start, end) for (start, end) in route_map if start == current_leg[1]), None)
+        
+        # If looped around to the first stop without finding the second stop, break
+        if not current_leg or current_leg[0] == first_stop:
+            return 0
+    
+    # Add the travel time of the last leg to reach the second stop
+    travel_time += route_map[current_leg]["travel_time_mins"]
+    
+    return travel_time
