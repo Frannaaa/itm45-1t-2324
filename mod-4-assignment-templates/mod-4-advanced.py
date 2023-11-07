@@ -133,7 +133,6 @@ def eta(first_stop, second_stop, route_map):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-     # Initialize the total travel time
     travel_time = 0
     
     # Find starting leg
@@ -145,17 +144,17 @@ def eta(first_stop, second_stop, route_map):
     
     # Loop til second stop is reached
     while current_leg[1] != second_stop:
-        # Add the travel time of the current leg
+        # Add travel time of current leg-olas 
         travel_time += route_map[current_leg]["travel_time_mins"]
         
         # Move to next leg
         current_leg = next(((start, end) for (start, end) in route_map if start == current_leg[1]), None)
         
-        # If looped around to the first stop without finding the second stop, break
+        # If looped around to first stop without finding second stop, break
         if not current_leg or current_leg[0] == first_stop:
             return 0
     
-    # Add the travel time of the last leg to reach the second stop
+    # Add travel time of last leg to reach second stop
     travel_time += route_map[current_leg]["travel_time_mins"]
     
     return travel_time
