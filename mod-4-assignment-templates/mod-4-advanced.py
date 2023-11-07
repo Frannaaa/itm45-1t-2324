@@ -45,18 +45,17 @@ def relationship_status(from_member, to_member, social_graph):
     followed_by = from_member in social_graph[to_member]["following"]
     
     #If follow each other
-    if to_member in social_graph[from_member]["following"] and from_member in social_graph[to_member]["following"]:
+   follows = to_member in social_graph[from_member]["following"]
+   followed_by = from_member in social_graph[to_member]["following"]
+    
+    if follows and followed_by:
         return "friends"
-    #from_member follows to_member
-    elif to_member in social_graph[from_member]["following"]:
+    elif follows:
         return "follower"
-    #to_member follows from_member
-    elif from_member in social_graph[to_member]["following"]:
+    elif followed_by:
         return "followed by"
-    # if none of the above, no relationship
     else:
         return "no relationship"
-
 
 
 def tic_tac_toe(board):
