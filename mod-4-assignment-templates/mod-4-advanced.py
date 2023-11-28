@@ -43,19 +43,15 @@ def relationship_status(from_member, to_member, social_graph):
     # Stay within the function. Only use the parameters as input. The function should return your answer.
     follows = to_member in social_graph[from_member]["following"]
     followed_by = from_member in social_graph[to_member]["following"]
-    
-    #If follow each other
-   follows = to_member in social_graph[from_member]["following"]
-   followed_by = from_member in social_graph[to_member]["following"]
-    
+
     if follows and followed_by:
         return "friends"
     elif follows:
         return "follower"
     elif followed_by:
         return "followed by"
-    else:
-        return "no relationship"
+
+    return "no relationship"
 
 
 def tic_tac_toe(board):
@@ -84,23 +80,38 @@ def tic_tac_toe(board):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-     size = len(board)
-    
-    # Chek rows and columns
-    for i in range(size):
-        if len(set(board[i])) == 1 and board[i][0] != ' ':
-            return board[i][0]
-        if len(set([board[j][i] for j in range(size)])) == 1 and board[0][i] != ' ':
-            return board[0][i]
-    
-    # Check diagonals
-    if len(set([board[i][i] for i in range(size)])) == 1 and board[0][0] != ' ':
-        return board[0][0]
-    if len(set([board[i][size - 1 - i] for i in range(size)])) == 1 and board[0][size - 1] != ' ':
-        return board[0][size - 1]
-    
-    # If no winner, return "NO WINNER"
+    size = len(board)
+    symbols = set()
+
+    # Check rows, columns, and diagonals respectively
+    # ['X', 'X', 'O']
+    # ['O', 'X', 'O']
+    # ['O', ' ', 'X']
+    # would look like this:
+    # [
+    #    ['X', 'X', 'O'], first row
+    #    ['O', 'X', 'O'], second row
+    #    ['O', ' ', 'X'], third row
+    #    ['X', 'O', 'O'], first column
+    #    ['X', 'X', ' '], second column
+    #    ['O', 'O', 'X'], third column
+    #    ['X', 'X', 'X'], first diagonal
+    #    ['O', 'X', 'O'] second diagonal
+    # ]
+
+    lines = [board[i] for i in range(size)] + \
+            [[board[j][i] for j in range(size)] for i in range(size)] + \
+            [[board[i][i] for i in range(size)], [board[i][size - 1 - i] for i in range(size)]]
+
+    for line in lines:
+        if all(item == line[0] and item != ' ' for item in line):  # check if all items in line are the same
+            symbols.add(line[0]) 
+
+    if len(symbols) == 1:
+        return symbols.pop()
+
     return "NO WINNER"
+
 
 def eta(first_stop, second_stop, route_map):
     '''ETA. 
@@ -134,26 +145,26 @@ def eta(first_stop, second_stop, route_map):
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
     travel_time = 0
-    
+
     # Find starting leg
     current_leg = next(((start, end) for (start, end) in route_map if start == first_stop), None)
-    
+
     # If starting leg doesn't exist, return 0 bc cannot calculate ETA
     if not current_leg:
         return 0
-    
+
     # Loop til second stop is reached
     while current_leg[1] != second_stop:
         # Add travel time of current leg-olas 
         travel_time += route_map[current_leg]["travel_time_mins"]
-        
+
         # Move to next leg
         current_leg = next(((start, end) for (start, end) in route_map if start == current_leg[1]), None)
         
         # If looped around to first stop without finding second stop, break
         if not current_leg or current_leg[0] == first_stop:
             return 0
-    
+
     # Add travel time of last leg to reach second stop
     travel_time += route_map[current_leg]["travel_time_mins"]
     
