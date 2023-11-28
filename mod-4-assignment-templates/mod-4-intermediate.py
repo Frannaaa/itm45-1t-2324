@@ -67,12 +67,12 @@ def caesar_cipher(message, shift):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-        message = message.upper()
+    message = message.upper()
     result = ""
+
     for char in message:
         if char.isalpha():  # Check d character is an alphabet
-            shifted_char = chr(((ord(char) - ord('A') + shift) % 26) + ord('A'))
-            result += shifted_char
+            result += chr(((ord(char) - 65 + shift) % 26) + 65)
         else:
             result += char  # For spaces and non-alphabetic characters
     return result
@@ -105,17 +105,17 @@ def shift_by_letter(letter, letter_shift):
     '''
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-     if letter == " ":
+    if letter == " ":
         return " "
     
-    # Check if the inputs are valid
-    if not (letter.isalpha() and letter.isupper()) and letter != " ":
+    # Check if the inputs are valid, ("A" <= letter <=  "Z") checks if the letter is an uppercase alphabet
+    if not ("A" <= letter <=  "Z") and letter != " ":
         return "Invalid character for letter"
-    if not (letter_shift.isalpha() and letter_shift.isupper()):
+    if not ("A" <= letter_shift <=  "Z"):
         return "Invalid character for letter_shift"
     
-    shift = ord(letter_shift) - ord('A')
-    shifted_value = ((ord(letter) - ord('A') + shift) % 26) + ord('A')
+    shift = ord(letter_shift) - 65
+    shifted_value = ((ord(letter) - 65 + shift) % 26) + 65
     return chr(shifted_value)
 
 def vigenere_cipher(message, key):
@@ -150,7 +150,7 @@ def vigenere_cipher(message, key):
     # Replace `pass` with your code. 
     # Stay within the function. Only use the parameters as input. The function should return your answer.
       # Extend the key to match the length of the message (ignoring spaces)
-   message = message.upper()
+    message = message.upper()
     key = key.upper()
     encrypted_message = ""
     key_index = 0
@@ -158,8 +158,8 @@ def vigenere_cipher(message, key):
     for letter in message:
         if letter.isalpha():
             # Calculate d shift to key
-            shift = ord(key[key_index % len(key)]) - ord('A')
-            shifted_letter = chr(((ord(letter) - ord('A') + shift) % 26) + ord('A'))
+            shift = ord(key[key_index % len(key)]) - 65
+            shifted_letter = chr(((ord(letter) - 65 + shift) % 26) + 65)
             encrypted_message += shifted_letter
             key_index += 1
         else:
