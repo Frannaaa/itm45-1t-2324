@@ -1,4 +1,4 @@
-import random
+import random  # Importing the random module for generating random numbers
 
 # Preset words list, all in uppercase for consistency
 WORDS = [
@@ -8,59 +8,76 @@ WORDS = [
     "MOM PICK ME UP I AM SCARED"
 ]
 
+# Define uppercase and lowercase alphabets for letter conversion
 alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
 
+# Function to convert a lowercase character to uppercase
 def char_to_upper(char):
-    for i in range(26):  # Assuming English alphabet
+    # Loop through the lowercase alphabet to find the corresponding uppercase letter
+    for i in range(26):
         if char == alphabet_lower[i]:
             return alphabet_upper[i]
-    return char  # Return as is if it's not a lowercase letter
+    return char  # Return the character as is if it's not a lowercase letter
 
+# Function to convert an entire string to uppercase
 def input_to_upper(input_string):
-    # Manually converting each character in the input string to uppercase without using .join()
+    # Convert each character in the input string to uppercase
     upper_string = ""
     for char in input_string:
         upper_string += char_to_upper(char)
     return upper_string
 
+# Function to check if a letter is in a string
 def is_letter_in_string(letter, string):
     return letter in string
 
+# Function to get the word choice from the user
 def get_word_choice():
+    # Ask the user if they want to choose a word or have the program pick a random one
     choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
     if choice == "NO":
-        word = input_to_upper(input("Here is the word to be guessed by your opponent: "))
+        # If the user chooses, ask for a word to be guessed
+        word = input_to_upper(input("Enter the word to be guessed by your opponent: "))
         return word
     else:
+        # Ask the user to choose the difficulty level
         difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
+        # Filter words based on the chosen difficulty and length
         filtered_words = [word for word in WORDS if (len(word) <= 3 and difficulty == "EASY") or
                                                      (3 < len(word) <= 5 and difficulty == "MEDIUM") or
                                                      (5 < len(word) <= 9 and difficulty == "HARD") or
                                                      (len(word) > 9 and difficulty == "EXTREME")]
         if filtered_words:
-            index = int(random.random() * len(filtered_words))  # Using random.random() to calculate a random index
+            # Pick a random word from the filtered list
+            index = int(random.random() * len(filtered_words))
             return filtered_words[index]
         else:
-            index = int(random.random() * len(WORDS))  # Fallback to a random word from the entire WORDS list
+            # If no words match the criteria, choose a random word from the entire list
+            index = int(random.random() * len(WORDS))
             return WORDS[index]
 
+# Function to set the number of guesses allowed
 def set_number_of_guesses():
     print("Please enter the number of guesses allowed:")
     num_guesses = input()
     valid_number = True
     for char in num_guesses:
+        # Check if the input contains only digits
         if not ('0' <= char <= '9'):
             valid_number = False
             break
     if valid_number and num_guesses:
         return int(num_guesses)
+    # If the input is invalid or empty, default to 6 guesses
     print("Invalid input. Defaulting to 6 guesses.")
     return 6
 
+# Function to display the current status of the game
 def display_status(word, guessed_letters, tries):
     display_word = ""
     for letter in word:
+        # Show guessed letters and spaces, hide unguessed letters with '-'
         if is_letter_in_string(letter, guessed_letters) or letter == " ":
             display_word += letter
         else:
@@ -70,10 +87,12 @@ def display_status(word, guessed_letters, tries):
     unused_letters = ""
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for letter in alphabet:
+        # Display unused letters
         if not is_letter_in_string(letter, guessed_letters):
             unused_letters += letter
     print("Unused letters: " + unused_letters)
 
+# Function to play the game
 def play_game(word, max_tries):
     guessed_letters = ""
     tries_left = max_tries
@@ -82,9 +101,11 @@ def play_game(word, max_tries):
     while tries_left > 0:
         correct_guesses = 0
         for letter in word:
+            # Count correctly guessed letters
             if is_letter_in_string(letter, guessed_letters) or letter == " ":
                 correct_guesses += 1
         if correct_guesses == len(word):
+            # If all letters guessed correctly, player wins
             print("CONGRATULATIONS! YOU WIN!")
             return
 
@@ -105,13 +126,15 @@ def play_game(word, max_tries):
                 else:
                     mistakes = 0
                 if mistakes == 3:
+                    # Provide a hint after 3 consecutive incorrect guesses
                     print("Hint: Try focusing on common vowels and consonants.")
                     mistakes = 0
             else:
-                print("Already guessed.")
+                print("You've already guessed that letter.")
         else:
             print("Invalid guess. Please enter a single letter.")
 
+# Main function to start the game
 def main():
     print("LET'S PLAY HANGMAN!\n")
     word = get_word_choice()
@@ -123,5 +146,6 @@ def main():
     elif input_to_upper(input("Start a new game? (Yes/No): ")) == "YES":
         main()
 
+# Entry point of the program
 if __name__ == "__main__":
     main()
