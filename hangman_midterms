@@ -36,42 +36,32 @@ def is_letter_in_string(letter, string):
 def get_word_choice():
     # Ask the user if they want to choose a word or have the program pick a random one
     choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
+    if choice not in ("YES", "NO"):
+        print("Please choose a valid option.")
+        return get_word_choice()
     if choice == "NO":
         # If the user chooses, ask for a word to be guessed
         word = input_to_upper(input("Enter the word to be guessed by your opponent: "))
         return word
     else:
         # Ask the user to choose the difficulty level
-        difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
-        # Filter words based on the chosen difficulty and length
-        filtered_words = [word for word in WORDS if (len(word) <= 3 and difficulty == "EASY") or
-                                                     (3 < len(word) <= 5 and difficulty == "MEDIUM") or
-                                                     (5 < len(word) <= 9 and difficulty == "HARD") or
-                                                     (len(word) > 9 and difficulty == "EXTREME")]
-        if filtered_words:
-            # Pick a random word from the filtered list
-            index = int(random.random() * len(filtered_words))
-            return filtered_words[index]
-        else:
-            # If no words match the criteria, choose a random word from the entire list
-            index = int(random.random() * len(WORDS))
-            return WORDS[index]
+        return get_difficulty()
+
+# Function to get the difficulty level from the user
+def get_difficulty():
+    difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
+    if difficulty not in ("EASY", "MEDIUM", "HARD", "EXTREME"):
+        print("Please choose a valid difficulty.")
+        return get_difficulty()
+    return difficulty
 
 # Function to set the number of guesses allowed
 def set_number_of_guesses():
-    print("Please enter the number of guesses allowed:")
-    num_guesses = input()
-    valid_number = True
-    for char in num_guesses:
-        # Check if the input contains only digits
-        if not ('0' <= char <= '9'):
-            valid_number = False
-            break
-    if valid_number and num_guesses:
-        return int(num_guesses)
-    # If the input is invalid or empty, default to 6 guesses
-    print("Invalid input. Defaulting to 6 guesses.")
-    return 6
+    num_guesses = input("Please enter the number of guesses allowed: ")
+    if not num_guesses.isdigit():
+        print("Please enter a valid number.")
+        return set_number_of_guesses()
+    return int(num_guesses)
 
 # Function to display the current status of the game
 def display_status(word, guessed_letters, tries):
@@ -130,9 +120,9 @@ def play_game(word, max_tries):
                     print("Hint: Try focusing on common vowels and consonants.")
                     mistakes = 0
             else:
-                print("You've already guessed that letter.")
+                print("You have already used that letter.")
         else:
-            print("Invalid guess. Please enter a single letter.")
+            print("Please choose a valid letter.")
 
 # Main function to start the game
 def main():
@@ -141,10 +131,17 @@ def main():
     max_tries = set_number_of_guesses()
     play_game(word, max_tries)
 
-    if input_to_upper(input("Play again with the same word? (Yes/No): ")) == "YES":
+    play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
+    if play_again == "YES":
         play_game(word, max_tries)
-    elif input_to_upper(input("Start a new game? (Yes/No): ")) == "YES":
-        main()
+    elif play_again == "NO":
+        start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
+        if start_new_game == "YES":
+            main()
+        elif start_new_game == "NO":
+            return
+        else:
+            print("Invalid input. Exiting the game.")
 
 # Entry point of the program
 if __name__ == "__main__":
