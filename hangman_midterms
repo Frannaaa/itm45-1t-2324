@@ -1,1 +1,116 @@
+import random
+
+# Preset words list, all in uppercase for consistency
+WORDS = [
+    "DIE", "TOP", "CRY", "MIKU", "LINK", "CODE", "SKYRIM", "MALENIA", "STARDEW",
+    "SUPERCALIFRAGILISTICEXPIALIDOCIOUS", "PNEUMONOULTRAMICROSCOPICSILICOVOLCANOCONIOSIS",
+    "WHAT IF I CRY AND EXPLODE INTO STARDUST", "LIFE IS BEAUTIFUL EVEN IF YOU DO BREAKDOWN OVER THIS CODE",
+    "SIRS PLEASE BE NICE TO ME I BLANK OUT WHEN NERVOUS"
+]
+
+def is_letter_in_string(letter, string):
+    alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
+    for i in range(26):  # Assuming English alphabet
+        if letter == alphabet_upper[i] or letter == alphabet_lower[i]:
+            for char in string:
+                if char == alphabet_upper[i] or char == alphabet_lower[i]:
+                    return True
+    return False
+
+def get_word_choice():
+    choice = input("Custom word or random? (custom/random): ")
+    if choice == "custom":
+        print("Enter a word or phrase for the other player to guess (Please use uppercase for consistency):")
+        return input()  # Assume user inputs in uppercase following instructions
+    else:
+        difficulty = input("Choose difficulty (easy/medium/hard/extreme): ")
+        filtered_words = []
+        for word in WORDS:
+            word_length = len([char for char in word if char != " "])
+            if ((word_length <= 3 and difficulty == "easy") or
+                (3 < word_length <= 5 and difficulty == "medium") or
+                (5 < word_length <= 9 and difficulty == "hard") or
+                (word_length > 9 and difficulty == "extreme")):
+                filtered_words.append(word)
+        return random.choice(filtered_words if filtered_words else WORDS)
+
+def set_number_of_guesses():
+    print("Number of guesses allowed:")
+    num_guesses = input()
+    valid_number = True
+    for char in num_guesses:
+        if not ('0' <= char <= '9'):
+            valid_number = False
+            break
+    if valid_number and num_guesses:
+        return int(num_guesses)
+    print("Invalid input. Defaulting to 6 guesses.")
+    return 6
+
+def display_status(word, guessed_letters, tries):
+    display_word = ""
+    for letter in word:
+        if is_letter_in_string(letter, guessed_letters) or letter == " ":
+            display_word += letter
+        else:
+            display_word += "-"
+    print("\nGuess the word, " + str(tries) + " guess(es) left: " + display_word)
+    
+    unused_letters = ""
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for letter in alphabet:
+        if not is_letter_in_string(letter, guessed_letters):
+            unused_letters += letter
+    print("Unused letters: " + unused_letters)
+
+def play_game(word, max_tries):
+    guessed_letters = ""
+    tries_left = max_tries
+    mistakes = 0
+
+    while tries_left > 0:
+        correct_guesses = 0
+        for letter in word:
+            if is_letter_in_string(letter, guessed_letters) or letter == " ":
+                correct_guesses += 1
+        if correct_guesses == len(word):
+            print("CONGRATULATIONS! YOU WIN!")
+            return
+
+        display_status(word, guessed_letters, tries_left)
+        guess = input("Guess a letter (Please use uppercase for consistency): ")
+
+        if guess in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" and len(guess) == 1:
+            already_guessed = is_letter_in_string(guess, guessed_letters)
+            if not already_guessed:
+                guessed_letters += guess
+                if not is_letter_in_string(guess, word):
+                    tries_left -= 1
+                    mistakes += 1
+                else:
+                    mistakes = 0
+                if mistakes == 3:
+                    print("Hint: Try focusing on common vowels and consonants.")
+                    mistakes = 0
+            else:
+                print("Already guessed.")
+        else:
+            print("Invalid guess. Please enter a single uppercase letter.")
+
+    print("SORRY, YOU ARE HANGED! The word was '" + word + "'.")
+
+def main():
+    print("LET'S PLAY HANGMAN!\n")
+    word = get_word_choice()
+    max_tries = set_number_of_guesses()
+    play_game(word, max_tries)
+
+    if input("Play again with the same word? (Yes/No): ") == "yes":
+        play_game(word, max_tries)
+    elif input("Start a new game? (Yes/No): ") == "yes":
+        main()
+
+if __name__ == "__main__":
+    main()
 
