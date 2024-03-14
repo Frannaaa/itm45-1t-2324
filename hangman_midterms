@@ -2,56 +2,51 @@ import random
 
 # Preset words list, all in uppercase for consistency
 WORDS = [
-    "DIE", "TOP", "CRY", "MIKU", "LINK", "CODE", "SKYRIM", "MALENIA", "STARDEW",
+    "DIE", "TOP", "CRY", "MIKU", "LINK", "CODE", "SKYRIM", "MALENIA", "STARDUST",
     "SUPERCALIFRAGILISTICEXPIALIDOCIOUS", "PNEUMONOULTRAMICROSCOPICSILICOVOLCANOCONIOSIS",
     "WHAT IF I CRY AND EXPLODE INTO STARDUST", "LIFE IS BEAUTIFUL EVEN IF YOU DO BREAKDOWN OVER THIS CODE",
-    "SIRS PLEASE BE NICE TO ME I BLANK OUT WHEN NERVOUS"
+    "MOM PICK ME UP I AM SCARED"
 ]
 
 alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
 
 def char_to_upper(char):
-    # Manually map lowercase input to uppercase
-    for i in range(26):
+    for i in range(26):  # Assuming English alphabet
         if char == alphabet_lower[i]:
             return alphabet_upper[i]
-    return char  # If it's not lowercase, return as is (assuming it's either uppercase or not a letter)
+    return char  # Return as is if it's not a lowercase letter
 
-def list_has(lst, item):
-    # Custom function to mimic the 'in' operator
-    for elem in lst:
-        if elem == item:
-            return True
-    return False
+def input_to_upper(input_string):
+    # Manually converting each character in the input string to uppercase without using .join()
+    upper_string = ""
+    for char in input_string:
+        upper_string += char_to_upper(char)
+    return upper_string
 
 def is_letter_in_string(letter, string):
-    # Convert to uppercase if it's lowercase
-    letter = char_to_upper(letter)
-    for char in string:
-        if char == letter:
-            return True
-    return False
+    return letter in string
 
 def get_word_choice():
-    choice = input("Custom word or random? (custom/random): ")
-    if choice == "custom":
-        print("Enter a word or phrase for the other player to guess (Please use uppercase for consistency):")
-        return input()  # Assume user inputs in uppercase following instructions
+    choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
+    if choice == "NO":
+        word = input_to_upper(input("Here is the word to be guessed by your opponent: "))
+        return word
     else:
-        difficulty = input("Choose difficulty (easy/medium/hard/extreme): ")
-        filtered_words = []
-        for word in WORDS:
-            word_length = len([char for char in word if char != " "])
-            if ((word_length <= 3 and difficulty == "easy") or
-                (3 < word_length <= 5 and difficulty == "medium") or
-                (5 < word_length <= 9 and difficulty == "hard") or
-                (word_length > 9 and difficulty == "extreme")):
-                filtered_words.append(word)
-        return random.choice(filtered_words if filtered_words else WORDS)
+        difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
+        filtered_words = [word for word in WORDS if (len(word) <= 3 and difficulty == "EASY") or
+                                                     (3 < len(word) <= 5 and difficulty == "MEDIUM") or
+                                                     (5 < len(word) <= 9 and difficulty == "HARD") or
+                                                     (len(word) > 9 and difficulty == "EXTREME")]
+        if filtered_words:
+            index = int(random.random() * len(filtered_words))  # Using random.random() to calculate a random index
+            return filtered_words[index]
+        else:
+            index = int(random.random() * len(WORDS))  # Fallback to a random word from the entire WORDS list
+            return WORDS[index]
 
 def set_number_of_guesses():
-    print("Number of guesses allowed:")
+    print("Please enter the number of guesses allowed:")
     num_guesses = input()
     valid_number = True
     for char in num_guesses:
@@ -95,8 +90,6 @@ def play_game(word, max_tries):
 
         display_status(word, guessed_letters, tries_left)
         
-        # Explicitly state the change for case insensitivity handling
-        print("Note: Guesses are case-insensitive. Please enter any letter in uppercase or lowercase.")
         guess = input("Guess a letter: ")
         
         # Convert the guessed letter to uppercase
@@ -125,9 +118,9 @@ def main():
     max_tries = set_number_of_guesses()
     play_game(word, max_tries)
 
-    if input("Play again with the same word? (Yes/No): ") == "yes":
+    if input_to_upper(input("Play again with the same word? (Yes/No): ")) == "YES":
         play_game(word, max_tries)
-    elif input("Start a new game? (Yes/No): ") == "yes":
+    elif input_to_upper(input("Start a new game? (Yes/No): ")) == "YES":
         main()
 
 if __name__ == "__main__":
