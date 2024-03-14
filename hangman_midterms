@@ -94,9 +94,15 @@ def play_game(word, max_tries):
             return
 
         display_status(word, guessed_letters, tries_left)
-        guess = input("Guess a letter (Please use uppercase for consistency): ")
+        
+        # Explicitly state the change for case insensitivity handling
+        print("Note: Guesses are case-insensitive. Please enter any letter in uppercase or lowercase.")
+        guess = input("Guess a letter: ")
+        
+        # Convert the guessed letter to uppercase
+        guess = char_to_upper(guess)
 
-        if guess in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" and len(guess) == 1:
+        if guess in alphabet_upper and len(guess) == 1:
             already_guessed = is_letter_in_string(guess, guessed_letters)
             if not already_guessed:
                 guessed_letters += guess
@@ -111,9 +117,7 @@ def play_game(word, max_tries):
             else:
                 print("Already guessed.")
         else:
-            print("Invalid guess. Please enter a single uppercase letter.")
-
-    print("SORRY, YOU ARE HANGED! The word was '" + word + "'.")
+            print("Invalid guess. Please enter a single letter.")
 
 def main():
     print("LET'S PLAY HANGMAN!\n")
