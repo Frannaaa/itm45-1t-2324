@@ -8,14 +8,29 @@ WORDS = [
     "SIRS PLEASE BE NICE TO ME I BLANK OUT WHEN NERVOUS"
 ]
 
+alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
+
+def char_to_upper(char):
+    # Manually map lowercase input to uppercase
+    for i in range(26):
+        if char == alphabet_lower[i]:
+            return alphabet_upper[i]
+    return char  # If it's not lowercase, return as is (assuming it's either uppercase or not a letter)
+
+def list_has(lst, item):
+    # Custom function to mimic the 'in' operator
+    for elem in lst:
+        if elem == item:
+            return True
+    return False
+
 def is_letter_in_string(letter, string):
-    alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
-    for i in range(26):  # Assuming English alphabet
-        if letter == alphabet_upper[i] or letter == alphabet_lower[i]:
-            for char in string:
-                if char == alphabet_upper[i] or char == alphabet_lower[i]:
-                    return True
+    # Convert to uppercase if it's lowercase
+    letter = char_to_upper(letter)
+    for char in string:
+        if char == letter:
+            return True
     return False
 
 def get_word_choice():
@@ -113,4 +128,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
