@@ -1,6 +1,60 @@
-import random  # Importing the random module for generating random numbers
+# Francine Y. de Asis, 221927
+# March 7, 2024
 
-# Preset words list, all in uppercase for consistency
+# I/we certify that this submission complies with the DISCS Academic Integrity
+# Policy.
+
+# If I/we have discussed my/our Python language code with anyone other than
+# my/our instructor(s), my/our groupmate(s), the teaching assistant(s),
+# the extent of each discussion has been clearly noted along with a proper
+# citation in the comments of my/our program.
+
+# If any Python language code or documentation used in my/our program
+# was obtained from another source, either modified or unmodified, such as a
+# textbook, website, or another individual, the extent of its use has been
+# clearly noted along with a proper citation in the comments of my/our program.
+
+################################################################################
+
+# cite your sources here, if any
+
+################################################################################
+# Francine Y. de Asis, 221927
+# March 7, 2024 
+
+# I/we certify that this submission complies with the DISCS Academic Integrity
+# Policy.
+
+# If I/we have discussed my/our Python language code with anyone other than
+# my/our instructor(s), my/our groupmate(s), the teaching assistant(s),
+# the extent of each discussion has been clearly noted along with a proper
+# citation in the comments of my/our program.
+
+# If any Python language code or documentation used in my/our program
+# was obtained from another source, either modified or unmodified, such as a
+# textbook, website, or another individual, the extent of its use has been
+# clearly noted along with a proper citation in the comments of my/our program.
+
+################################################################################
+
+# cite your sources here, if any
+
+################################################################################
+#additional features for uniqueness: supports phrases, two or more words/phrase, hints if 3 mistakes straight, for random list they can choose easy (4 letters max), medium (4-6 letters), or hard (7-any number of letters)
+#avoid using index, .choice, chr, sum, enumerate, .replace, join , next, all  format , .join(), .isdigit(), .lstrip(), all(), enumerate, .isalpha(), and of .values . sum, any, max, next. import randomimport random
+#expands to numbers 
+
+
+'''
+questions:
+-can allowed phrases be an orig feature 
+- incorporating hangman stage but also the any number of guesses, is it possible it just restarts?
+ - in and not in, as a compa opera not allowed
+
+'''
+import random
+
+# Global variables Preset words list, all in uppercase for consistency
 WORDS = [
     "DIE", "TOP", "CRY", "MIKU", "LINK", "CODE", "SKYRIM", "MALENIA", "STARDUST",
     "SUPERCALIFRAGILISTICEXPIALIDOCIOUS", "PNEUMONOULTRAMICROSCOPICSILICOVOLCANOCONIOSIS",
@@ -8,21 +62,79 @@ WORDS = [
     "MOM PICK ME UP I AM SCARED"
 ]
 
-# Define uppercase and lowercase alphabets for letter conversion
+# Utlityt Functions Define uppercase and lowercase alphabets for letter conversion
 alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
 
+# Hangman stick figure stages
+hangman_stages = [
+    """
+    _____
+    |   |
+    |
+    |
+    |
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |
+    |
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |   |
+    |
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |  /|
+    |
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |  /|\\
+    |
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |  /|\\
+    |  /
+    |
+    """,
+    """
+    _____
+    |   |
+    |   O
+    |  /|\\
+    |  / \\
+    |
+    """
+]
+
 # Function to convert a lowercase character to uppercase
 def char_to_upper(char):
-    # Loop through the lowercase alphabet to find the corresponding uppercase letter
-    for i in range(26):
+    for i in range(len(alphabet_lower)):
         if char == alphabet_lower[i]:
             return alphabet_upper[i]
-    return char  # Return the character as is if it's not a lowercase letter
+    return char
 
 # Function to convert an entire string to uppercase
 def input_to_upper(input_string):
-    # Convert each character in the input string to uppercase
     upper_string = ""
     for char in input_string:
         upper_string += char_to_upper(char)
@@ -30,57 +142,92 @@ def input_to_upper(input_string):
 
 # Function to check if a letter is in a string
 def is_letter_in_string(letter, string):
-    return letter in string
+    for char in string:
+        if char == letter:
+            return True
+    return False
 
-# Function to get the word choice from the user
+# Function to get the word choice from the user,
 def get_word_choice():
-    # Ask the user if they want to choose a word or have the program pick a random one
+    valid_responses = ["YES", "NO"]
     choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
-    if choice not in ("YES", "NO"):
-        print("Please choose a valid option.")
-        return get_word_choice()
+    while not validate_choice(choice, valid_responses):
+        print("Invalid choice. Please enter 'Yes' or 'No'.")
+        choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
     if choice == "NO":
-        # If the user chooses, ask for a word to be guessed
-        word = input_to_upper(input("Enter the word to be guessed by your opponent: "))
-        return word
+        return input_to_upper(input("Enter the word to be guessed by your opponent: "))
     else:
-        # Ask the user to choose the difficulty level
         return get_difficulty()
 
 # Function to get the difficulty level from the user
 def get_difficulty():
     difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
-    if difficulty not in ("EASY", "MEDIUM", "HARD", "EXTREME"):
+    while difficulty != "EASY" and difficulty != "MEDIUM" and difficulty != "HARD" and difficulty != "EXTREME":
         print("Please choose a valid difficulty.")
-        return get_difficulty()
+        difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
     return difficulty
 
 # Function to set the number of guesses allowed
 def set_number_of_guesses():
     num_guesses = input("Please enter the number of guesses allowed: ")
-    if not num_guesses.isdigit():
-        print("Please enter a valid number.")
-        return set_number_of_guesses()
-    return int(num_guesses)
+    is_valid = True
+    for char in num_guesses:
+        if not ('0' <= char <= '9'):
+            is_valid = False
+            break
+    if is_valid and num_guesses:
+        return int(num_guesses)
+    else:
+        print("Invalid input. Defaulting to 6 guesses.")
+        return 6
 
 # Function to display the current status of the game
 def display_status(word, guessed_letters, tries):
     display_word = ""
     for letter in word:
-        # Show guessed letters and spaces, hide unguessed letters with '-'
-        if is_letter_in_string(letter, guessed_letters) or letter == " ":
+        if is_letter_present(letter, guessed_letters) or letter == " ":
             display_word += letter
         else:
             display_word += "-"
     print("\nGuess the word, " + str(tries) + " guess(es) left: " + display_word)
     
     unused_letters = ""
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for letter in alphabet:
-        # Display unused letters
-        if not is_letter_in_string(letter, guessed_letters):
+        if not is_letter_present(letter, guessed_letters):
             unused_letters += letter
     print("Unused letters: " + unused_letters)
+
+def is_letter_present(letter, string):
+    for char in string:
+        if char == letter:
+            return True
+    return False
+
+def input_to_upper(input_string):
+    upper_string = ""
+    for char in input_string:
+        if char >= 'a' and char <= 'z':
+            upper_string += chr(ord(char) - 32)  # Convert to uppercase
+        else:
+            upper_string += char
+    return upper_string
+
+def validate_choice(choice, valid_options):
+    for option in valid_options:
+        if choice == option:
+            return True
+    return False
+
+def get_word_choice():
+    valid_responses = ["YES", "NO"]
+    choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
+    while not validate_choice(choice, valid_responses):
+        print("Invalid choice. Please enter 'Yes' or 'No'.")
+        choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
+    if choice == "NO":
+        return input_to_upper(input("Enter the word to be guessed by your opponent: "))
+    else:
+        return get_difficulty()
 
 # Function to play the game
 def play_game(word, max_tries):
@@ -101,12 +248,12 @@ def play_game(word, max_tries):
 
         display_status(word, guessed_letters, tries_left)
         
-        guess = input("Guess a letter: ")
+        guess = char_to_upper(input(""))
         
         # Convert the guessed letter to uppercase
         guess = char_to_upper(guess)
 
-        if guess in alphabet_upper and len(guess) == 1:
+        if is_letter_present(guess, alphabet_upper) and len(guess) == 1:
             already_guessed = is_letter_in_string(guess, guessed_letters)
             if not already_guessed:
                 guessed_letters += guess
@@ -124,6 +271,8 @@ def play_game(word, max_tries):
         else:
             print("Please choose a valid letter.")
 
+    print("SORRY YOU GOT HANGED!")  # Print
+
 # Main function to start the game
 def main():
     print("LET'S PLAY HANGMAN!\n")
@@ -132,10 +281,18 @@ def main():
     play_game(word, max_tries)
 
     play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
+    while play_again not in ["YES", "NO"]:
+        print("Please enter a valid option (Yes/No).")
+        play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
+
     if play_again == "YES":
         play_game(word, max_tries)
     elif play_again == "NO":
         start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
+        while start_new_game not in ["YES", "NO"]:
+            print("Please enter a valid option.")
+            start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
+            
         if start_new_game == "YES":
             main()
         elif start_new_game == "NO":
