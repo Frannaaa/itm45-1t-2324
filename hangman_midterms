@@ -89,28 +89,37 @@ def is_letter_in_string(letter, string):
     return False
 
 def display_hangman_for_six_guesses(tries_left):
-    # Determine the stage based on the number of tries left
-    if tries_left == 6:
-        # Initial figure for 6 guesses left (blank canvas)
-        print("\n\n\n\n\n")
-    elif tries_left == 5:
-        # After the 1st incorrect guess
-        print(" O\n\n\n\n")
-    elif tries_left == 4:
-        # After the 2nd incorrect guess
-        print(" O\n |\n\n\n")
-    elif tries_left == 3:
-        # After the 3rd incorrect guess
-        print(" O\n\|\n\n\n")
-    elif tries_left == 2:
-        # After the 4th incorrect guess
-        print(" O\n\|/\n\n\n")
-    elif tries_left == 1:
-        # After the 5th incorrect guess
-        print(" O\n\|/\n /\n\n")
+    if tries_left <= 6:
+        # Determine the stage based on the number of tries left
+        if tries_left == 6:
+            # Initial figure for 6 guesses left (blank canvas)
+            print("\n\n\n\n\n")
+        elif tries_left == 5:
+            # After the 1st incorrect guess
+            print(" O\n\n\n\n")
+        elif tries_left == 4:
+            # After the 2nd incorrect guess
+            print(" O\n |\n\n\n")
+        elif tries_left == 3:
+            # After the 3rd incorrect guess
+            print(" O\n\|\n\n\n")
+        elif tries_left == 2:
+            # After the 4th incorrect guess
+            print(" O\n\|/\n\n\n")
+        elif tries_left == 1:
+            # After the 5th incorrect guess
+            print(" O\n\|/\n /\n\n")
+        else:
+            # Final figure after the 6th incorrect guess
+            print(" O\n\|/\n / \\")
+
     else:
-        # Final figure after the 6th incorrect guess
-        print(" O\n\|/\n / \\")
+        # After the 7th incorrect guess and beyond
+        print(" O")  # Head
+        print("\|/")  # Body and arms
+        for _ in range(tries_left - 6):
+            print(" |")  # Additional vertical lines
+        print("/\\")
 
 def display_hangman(tries_left):
     if tries_left == 1:
@@ -119,7 +128,6 @@ def display_hangman(tries_left):
     else:
         # Final figure when the guess is incorrect (0 guesses left)
         print(" O\n\|/\n/\\")
-
         
 # Function to get the word choice from the user,
 def get_word_choice():
