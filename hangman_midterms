@@ -40,7 +40,7 @@
 # cite your sources here, if any
 
 ################################################################################
-#additional features for uniqueness: supports phrases, two or more words/phrase, hints if 3 mistakes straight, for random list they can choose easy (4 letters max), medium (4-6 letters), or hard (7-any number of letters)
+#additional features for uniqueness: supports phrases, can choose difficulty levels, hangman display, uppercase and lowercase valid can be custom or let program choose word for you,hints if 3 mistakes straight, for random list they can choose easy (4 letters max), medium (4-6 letters), or hard (7-any number of letters)
 #avoid using index, .choice, chr, sum, enumerate, .replace, join , next, all  format , .join(), .isdigit(), .lstrip(), all(), enumerate, .isalpha(), and of .values . sum, any, max, next. import randomimport random
 #to fix: hangman display figure, remove ord 
 
@@ -89,56 +89,47 @@ def is_letter_in_string(letter, string):
             return True
     return False
 
-def showStickman(cur_guesses, max_guesses):
-    # assume cur_guesses <= max_guesses <= 26
-    # size 1 - small, size 2 - medium, size 3 = big stickman
-    size, height, width, mx_sticks = 1, 6, 8, 6
-    if 6 < max_guesses and max_guesses <= 14:
-        size, height, width, mx_sticks = 2, 8, 12, 14
-    elif 14 < max_guesses:
-        size, height, width, mx_sticks = 3, 11, 19, 26
-    
-    sticks = mx_sticks - (max_guesses - cur_guesses)
-    stickman = [[" " for j in range(width)] for i in range(height)]
-    head_x = width-2 - 3*(size-1)
-    # build the pole
-    for i in range(head_x+1):
-        stickman[0][i] = "-"
-    for i in range(1, height):
-        stickman[i][0] = "|"
-    stickman[1][head_x] = "|"
-    
-    # head and neck
-    if sticks >= 1:
-        stickman[2][head_x] = 'O'
-        sticks -= 1
-    if sticks >= 1:
-        stickman[3][head_x] = '|'
-        sticks -= 1
+def showStickman(cur_guesses):
+    # assume cur_guesses <= 26
+    height = 10
+    width = 19
+    stickman = [[" " for i in range(width)] for i in range(height)]
+    for row in range(1, height):
+        stickman[row][0] = "|"
+    for col in range(13):
+        stickman[0][col] = "-"
+    stickman[1][12] = "|"
 
-    # limbs
-    limbs = [sticks//4 for i in range(4)]
-    for i in range(sticks%4):
+    if cur_guesses >= 1:
+        stickman[2][12] = 'O'
+        cur_guesses -= 1
+    if cur_guesses >= 1:
+        stickman[3][12] = '|'
+        cur_guesses -= 1
+
+    limbs = [cur_guesses//4 for i in range(4)]
+    for i in range(cur_guesses%4):
         limbs[i] += 1
     
     # left arm
     for i in range(limbs[0]):
-        stickman[3][head_x-1-i] = '-'
+        stickman[3][12-i-1] = '-'
     
     # right arm
     for i in range(limbs[1]):
-        stickman[3][head_x+1+i] = '-'
+        stickman[3][12+i+1] = '-'
     
     # left foot
     for i in range(limbs[2]):
-        stickman[4+i][head_x-1-i] = '/'
+        stickman[4+i][12-i-1] = '/'
     
     # right foot
     for i in range(limbs[3]):
-        stickman[4+i][head_x+1+i] = '\\'
+        stickman[4+i][12+i+1] = '\\'
 
     for row in stickman:
-        print(*row, sep="")
+        print(*row, sep='')
+
         
 # Function to get the difficulty level from the user
 def get_difficulty():
@@ -256,7 +247,7 @@ def play_game(word, max_tries):
         display_status(word, guessed_letters, tries_left)
         
         cur_guesses = max_tries - tries_left
-        showStickman(cur_guesses, max_tries)
+        showStickman(cur_guesses)
         
         guess = input("Your guess: ")
         guess = char_to_upper(guess)  # Convert guess to uppercase
@@ -315,7 +306,7 @@ def play_game(word, max_tries):
             return
     
     print("SORRY YOU GOT HANGED! The word was:", word)
-    showStickman(max_tries, max_tries)
+    showStickman(cur_guesses)
 
 def main(word=None, max_tries=None):
     if not word or not max_tries:  # If no word or max_tries provided, initialize game
