@@ -257,8 +257,8 @@ def PLAY_HANGMAN(word, max_tries):
 
         valid_guess = False
         for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-            valid_guess = guess == letter
-            if valid_guess:
+            if guess == letter:
+                valid_guess = True
                 break
 
         if not valid_guess or len(guess) != 1:
@@ -267,8 +267,8 @@ def PLAY_HANGMAN(word, max_tries):
 
         already_guessed = False
         for guessed in guessed_letters:
-            already_guessed = guess == guessed
-            if already_guessed:
+            if guess == guessed:
+                already_guessed = True
                 break
 
         if not already_guessed:
@@ -276,8 +276,8 @@ def PLAY_HANGMAN(word, max_tries):
 
             guess_in_word = False
             for char in word:
-                guess_in_word = guess == char
-                if guess_in_word:
+                if guess == char:
+                    guess_in_word = True
                     break
 
             if not guess_in_word:
@@ -296,8 +296,8 @@ def PLAY_HANGMAN(word, max_tries):
             if letter != " ":
                 letter_found = False
                 for guessed_letter in guessed_letters:
-                    letter_found = letter == guessed_letter
-                    if letter_found:
+                    if letter == guessed_letter:
+                        letter_found = True
                         break
                 if not letter_found:
                     all_guessed = False
