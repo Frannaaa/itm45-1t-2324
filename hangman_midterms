@@ -130,7 +130,6 @@ def showStickman(cur_guesses):
     for row in stickman:
         print(*row, sep='')
 
-        
 # Function to get the difficulty level from the user
 def get_difficulty():
     difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
@@ -239,45 +238,44 @@ def get_word_choice():
         return filtered_words[random_index]
 
 def play_game(word, max_tries):
-    guessed_letters: List[str] = []
+    guessed_letters = []
     tries_left = max_tries
     mistakes = 0
 
     while tries_left > 0:
         display_status(word, guessed_letters, tries_left)
-        
+
         cur_guesses = max_tries - tries_left
         showStickman(cur_guesses)
-        
+
         guess = input("Your guess: ")
         guess = char_to_upper(guess)  # Convert guess to uppercase
-        
-        # Check if guess is valid (single uppercase letter)
+
         valid_guess = False
         for letter in alphabet_upper:
             if guess == letter:
                 valid_guess = True
                 break
-        
+
         if not valid_guess or len(guess) != 1:
             print("Invalid input. Please enter a single letter.")
             continue
-        
+
         already_guessed = False
         for guessed in guessed_letters:
             if guess == guessed:
                 already_guessed = True
                 break
-        
+
         if not already_guessed:
             guessed_letters.append(guess)
-            
+
             guess_in_word = False
             for char in word:
                 if guess == char:
                     guess_in_word = True
                     break
-            
+
             if not guess_in_word:
                 tries_left -= 1
                 mistakes += 1
@@ -288,7 +286,7 @@ def play_game(word, max_tries):
                 mistakes = 0
         else:
             print("You have already used that letter.")
-        
+
         all_guessed = True
         for letter in word:
             if letter != " ":
@@ -300,13 +298,17 @@ def play_game(word, max_tries):
                 if not letter_found:
                     all_guessed = False
                     break
-        
+
         if all_guessed:
             print("CONGRATULATIONS! YOU WIN!")
             return
-    
-    print("SORRY YOU GOT HANGED! The word was:", word)
-    showStickman(cur_guesses)
+
+    print("SORRY YOU GOT HANGED!")
+    # Check if the player was hanged with guesses between 1 to 5
+    if max_tries - tries_left < 6:
+        showStickman(6)  # Display full stickman
+    else:
+        showStickman(cur_guesses)  # Display stickman according to remaining guesses
 
 def main(word=None, max_tries=None):
     if not word or not max_tries:  # If no word or max_tries provided, initialize game
