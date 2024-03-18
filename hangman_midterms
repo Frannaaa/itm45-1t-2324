@@ -88,23 +88,56 @@ def is_letter_in_string(letter, string):
             return True
     return False
 
-def generate_hangman_stages(max_tries):
-    stages = [""] * (max_tries + 1)  # Create a list with placeholders
-    for i in range(1, max_tries + 1):
-        stage = "\n" * (max_tries - i)  # Create empty lines
-        if i >= 1:
-            stage += " O\n"  # Head
-        if i >= 2:
-            stage += " |"  # Body
-        if i >= 3:
-            stage += " /"  # One leg
-        if i >= 4:
-            stage = stage[:-1] + "/\\"  # Both legs
-        stages[i] = stage
-    return stages
+def showStickman(cur_guesses, max_guesses):
+    # assume cur_guesses <= max_guesses <= 26
+    # size 1 - small, size 2 - medium, size 3 = big stickman
+    size, height, width, mx_sticks = 1, 6, 8, 6
+    if 6 < max_guesses and max_guesses <= 14:
+        size, height, width, mx_sticks = 2, 8, 12, 14
+    elif 14 < max_guesses:
+        size, height, width, mx_sticks = 3, 11, 19, 26
+    
+    sticks = mx_sticks - (max_guesses - cur_guesses)
+    stickman = [[" " for j in range(width)] for i in range(height)]
+    head_x = width-2 - 3*(size-1)
+    # build the pole
+    for i in range(head_x+1):
+        stickman[0][i] = "-"
+    for i in range(1, height):
+        stickman[i][0] = "|"
+    stickman[1][head_x] = "|"
+    
+    # head and neck
+    if sticks >= 1:
+        stickman[2][head_x] = 'O'
+        sticks -= 1
+    if sticks >= 1:
+        stickman[3][head_x] = '|'
+        sticks -= 1
 
-def display_hangman(tries_left, stages):
-    print(stages[tries_left])
+    # limbs
+    limbs = [sticks//4 for i in range(4)]
+    for i in range(sticks%4):
+        limbs[i] += 1
+    
+    # left arm
+    for i in range(limbs[0]):
+        stickman[3][head_x-1-i] = '-'
+    
+    # right arm
+    for i in range(limbs[1]):
+        stickman[3][head_x+1+i] = '-'
+    
+    # left foot
+    for i in range(limbs[2]):
+        stickman[4+i][head_x-1-i] = '/'
+    
+    # right foot
+    for i in range(limbs[3]):
+        stickman[4+i][head_x+1+i] = '\\'
+
+    for row in stickman:
+        print(*row, sep="")
         
 # Function to get the word choice from the user,
 def get_word_choice():
@@ -142,16 +175,22 @@ def count_letters(word):
     return letter_count
 
 def filter_words_by_difficulty(words, difficulty):
+    def has_space(word):
+        for char in word:
+            if char == ' ':  # Check for space without using 'in' or 'notin'
+                return True
+        return False
+
     if difficulty == "EASY":
         return [word for word in words if len(word) <= 4]
     elif difficulty == "MEDIUM":
         return [word for word in words if 5 <= len(word) <= 6]
     elif difficulty == "HARD":
-        # HARD: Long words without spaces
-        return [word for word in words if len(word) > 9 and " " not in word]
+        # HARD: Long words without spaces, manually check for space
+        return [word for word in words if len(word) > 9 and not has_space(word)]
     elif difficulty == "EXTREME":
-        # EXTREME: Phrases or words with spaces
-        return [word for word in words if " " in word]
+        # EXTREME: Phrases or words with spaces, manually check for space
+        return [word for word in words if has_space(word)]
     return []  # Return an empty list as a fallback
 
 # Adjust get_word_choice to use filter_words_by_difficulty after getting difficulty
@@ -192,11 +231,6 @@ def is_letter_present(letter, string):
         if char == letter:
             return True
     return False
-
-def input_to_upper(input_string):
-    upper_string = ""
-    lowercase_letters = list("abcdefghijklmnopqrstuvwxyz")
-    uppercase_letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     
     for char in input_string:
         if 'a' <= char <= 'z':
@@ -235,26 +269,46 @@ def get_word_choice():
         return filtered_words[random_index]
 
 def play_game(word, max_tries):
-    guessed_letters = ""
+    guessed_letters = []
     tries_left = max_tries
     mistakes = 0
-    hangman_stages = generate_hangman_stages(max_tries)
 
     while tries_left > 0:
         display_status(word, guessed_letters, tries_left)
         
-        # Display hangman for the current stage
-        display_hangman(tries_left, hangman_stages)
+        cur_guesses = max_tries - tries_left
+        showStickman(cur_guesses, max_tries)
         
-        guess = input("Your guess: ").upper()
+        guess = input("Your guess: ")
+        guess = char_to_upper(guess)  # Convert guess to uppercase
         
-        if len(guess) != 1 or not guess.isalpha():
+        # Check if guess is valid (single uppercase letter)
+        valid_guess = False
+        for letter in alphabet_upper:
+            if guess == letter:
+                valid_guess = True
+                break
+        
+        if not valid_guess or len(guess) != 1:
             print("Invalid input. Please enter a single letter.")
             continue
         
-        if guess not in guessed_letters:
-            guessed_letters += guess
-            if guess not in word:
+        already_guessed = False
+        for guessed in guessed_letters:
+            if guess == guessed:
+                already_guessed = True
+                break
+        
+        if not already_guessed:
+            guessed_letters.append(guess)
+            
+            guess_in_word = False
+            for char in word:
+                if guess == char:
+                    guess_in_word = True
+                    break
+            
+            if not guess_in_word:
                 tries_left -= 1
                 mistakes += 1
                 if mistakes == 3:
@@ -265,12 +319,17 @@ def play_game(word, max_tries):
         else:
             print("You have already used that letter.")
         
-        # Check if all letters have been guessed
         all_guessed = True
         for letter in word:
-            if letter != " " and letter not in guessed_letters:
-                all_guessed = False
-                break
+            if letter != " ":
+                letter_found = False
+                for guessed_letter in guessed_letters:
+                    if letter == guessed_letter:
+                        letter_found = True
+                        break
+                if not letter_found:
+                    all_guessed = False
+                    break
         
         if all_guessed:
             print("CONGRATULATIONS! YOU WIN!")
