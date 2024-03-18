@@ -49,6 +49,7 @@ questions:
 -can allowed phrases be an orig feature 
 - incorporating hangman stage but also the any number of guesses, is it possible it just restarts?
  - in and not in, as a compa opera not allowed
+ - letter_found
 
 '''
 
@@ -63,31 +64,22 @@ WORDS = [
     "MOM PICK ME UP I AM SCARED"
 ]
 
-# Utlityt Functions Define uppercase and lowercase alphabets for letter conversion
+# Utlity Functions Define uppercase and lowercase alphabets for letter conversion
 alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 alphabet_lower = "abcdefghijklmnopqrstuvwxyz"
 alphabet = alphabet_upper  # This is assuming you're using uppercase letters for unused letters display
 
-# Function to convert a lowercase character to uppercase
-def char_to_upper(char):
-    for i in range(len(alphabet_lower)):
-        if char == alphabet_lower[i]:
-            return alphabet_upper[i]
-    return char
-
 # Function to convert an entire string to uppercase
-def input_to_upper(input_string):
+def input_to_upper(input_string): 
     upper_string = ""
     for char in input_string:
-        upper_string += char_to_upper(char)
+        for i in range(len(alphabet_lower)):
+            if char == alphabet_lower[i]:
+                upper_string += alphabet_upper[i]
+                break
+        else:
+            upper_string += char  # If character is not in alphabet_lower, add it as is
     return upper_string
-
-# Function to check if a letter is in a string
-def is_letter_in_string(letter, string):
-    for char in string:
-        if char == letter:
-            return True
-    return False
 
 def showStickman(cur_guesses):
     # assume cur_guesses <= 26
@@ -130,115 +122,127 @@ def showStickman(cur_guesses):
     for row in stickman:
         print(*row, sep='')
 
-# Function to get the difficulty level from the user
-def get_difficulty():
-    difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
-    while difficulty != "EASY" and difficulty != "MEDIUM" and difficulty != "HARD" and difficulty != "EXTREME":
-        print("Please choose a valid difficulty.")
-        difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
-    return difficulty
-
-def count_letters(word):
-    letter_count = 0
-    for char in word:
-        if char != " ":  # Skip spaces
-            letter_count += 1
-    return letter_count
-
-def filter_words_by_difficulty(words, difficulty):
-    def has_space(word):
-        for char in word:
-            if char == ' ':  # Check for space without using 'in' or 'notin'
-                return True
-        return False
-
-    if difficulty == "EASY":
-        return [word for word in words if len(word) <= 4]
-    elif difficulty == "MEDIUM":
-        return [word for word in words if 5 <= len(word) <= 6]
-    elif difficulty == "HARD":
-        # HARD: Long words without spaces, manually check for space
-        return [word for word in words if len(word) > 9 and not has_space(word)]
-    elif difficulty == "EXTREME":
-        # EXTREME: Phrases or words with spaces, manually check for space
-        return [word for word in words if has_space(word)]
-    return []  # Return an empty list as a fallback
-
-# Adjust get_word_choice to use filter_words_by_difficulty after getting difficulty
-
-# Function to set the number of guesses allowed
-def set_number_of_guesses():
-    num_guesses = input("Please enter the number of guesses allowed: ")
-    is_valid = True
-    for char in num_guesses:
-        if not ('0' <= char <= '9'):
-            is_valid = False
-            break
-    if is_valid and num_guesses:
-        return int(num_guesses)
-    else:
-        print("Invalid input. Defaulting to 6 guesses.")
-        return 6
-
-# Function to display the current status of the game
-def display_status(word, guessed_letters, tries):
-    print("\nGuess the word, " + str(tries) + " guess(es) left: ", end="")
-    for letter in word:
-        if letter == " " or is_letter_present(letter, guessed_letters):
-            print(letter, end="")
-        else:
-            print("-", end="")
-    print()  # For newline after the word
-
-    # Display unused letters
-    print("Unused letters: ", end="")
-    for letter in alphabet_upper:
-        if not is_letter_present(letter, guessed_letters):
-            print(letter, end="")
-    print()  # For newline after unused letters
-
-def is_letter_present(letter, string):
-    for char in string:
-        if char == letter:
-            return True
-    return False
-
-def validate_choice(choice, valid_options):
-    for option in valid_options:
-        if choice == option:
-            return True
-    return False
-
 def get_word_choice():
-    valid_responses = ["YES", "NO"]
     choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
     
-    while not validate_choice(choice, valid_responses):
+    while choice != "YES" and choice != "NO":
         print("Invalid choice. Please enter 'Yes' or 'No'.")
         choice = input_to_upper(input("Would you like the program to choose a random word? (Yes/No): "))
     
     if choice == "NO":
-        valid_word = False
-        while not valid_word:
+        while True:
             word = input_to_upper(input("Enter the word to be guessed by your opponent: "))
             valid_word = True
             for char in word:
-                if char != " " and not is_letter_in_string(char, alphabet_upper):
-                    valid_word = False
-                    print("The word should only contain letters and spaces. Please try again.")
-                    break
-        return word
+                if char != " ":
+                    char_found = False
+                    for allowed_char in alphabet:
+                        if char == allowed_char:
+                            char_found = True
+                            break
+                    if not char_found:
+                        valid_word = False
+                        print("The word should only contain valid characters and spaces. Please try again.")
+                        break
+            if valid_word:
+                return word
     else:
-        difficulty = get_difficulty()
-        filtered_words = filter_words_by_difficulty(WORDS, difficulty)
+        difficulty_input_valid = False
+        while not difficulty_input_valid:
+            difficulty = input_to_upper(input("Choose difficulty (easy/medium/hard/extreme): "))
+            if difficulty == "EASY":
+                filtered_words = [word for word in WORDS if len(word) <= 4]
+                difficulty_input_valid = True
+            elif difficulty == "MEDIUM":
+                filtered_words = [word for word in WORDS if 5 <= len(word) <= 6]
+                difficulty_input_valid = True
+            elif difficulty == "HARD":
+                filtered_words = [word for word in WORDS if len(word) > 9 and " " not in word]
+                difficulty_input_valid = True
+            elif difficulty == "EXTREME":
+                filtered_words = [word for word in WORDS if " " in word]
+                difficulty_input_valid = True
+            else:
+                print("Please choose a valid difficulty.")
+        
         if not filtered_words:
             print("No words available for this difficulty. Please choose a different difficulty.")
-            return get_word_choice()  # Recursively call to ensure a valid word is chosen
+            return get_word_choice()  # Ensuring a valid word is chosen
+        
         random_index = int(random.random() * len(filtered_words))
         return filtered_words[random_index]
+    
+# Function to display the current status of the game
+def display_status(word, guessed_letters, tries):
+    print("\nGuess the word, " + str(tries) + " guess(es) left: ", end="")
+    # Manually building the displayed word string
+    displayed_word = ""
+    for letter in word:
+        letter_found = False
+        for guessed_letter in guessed_letters:
+            if letter == guessed_letter or letter == " ":
+                displayed_word += letter
+                letter_found = True
+                break  # Break out of the inner loop once the letter is found
+        if not letter_found:
+            displayed_word += "-"
+    print(displayed_word)
+
+    # Manually building the string for unused letters
+    print("Unused letters: ", end="")
+    unused_letters = ""
+    for letter in alphabet:
+        letter_used = False
+        for guessed_letter in guessed_letters:
+            if letter == guessed_letter:
+                letter_used = True
+                break  # Break out of the inner loop once the letter is found
+        if not letter_used:
+            unused_letters += letter
+    print(unused_letters)
+
+def main(word=None, max_tries=None):
+    if not word:  # If no word provided, get a word choice
+        print("LET'S PLAY HANGMAN!\n")
+        word = get_word_choice()
+
+    if not max_tries:  # If no max_tries provided, ask for it
+        while True:
+            num_guesses_input = input("Please enter the number of guesses allowed: ")
+            if num_guesses_input.isdigit():
+                max_tries = int(num_guesses_input)
+                break
+            else:
+                print("Invalid input. Please enter a numerical value.")
+        if max_tries < 1:  # Ensuring at least one guess is allowed
+            print("Invalid input. Defaulting to 6 guesses.")
+            max_tries = 6
+
+    play_game(word, max_tries)
+
+    # Ask to play again with the same word
+    play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
+    while play_again != "YES" and play_again != "NO":
+        print("Please enter 'Yes' or 'No'.")
+        play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
+
+    if play_again == "YES":
+        main(word, max_tries)
+    else:
+        # If not replaying with the same word, ask to start a new game
+        start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
+        while start_new_game != "YES" and start_new_game != "NO":
+            print("Please enter 'Yes' or 'No'.")
+            start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
+        
+        if start_new_game == "YES":
+            main()  # Start a completely new game
+        elif start_new_game == "NO":
+            print("Thank you for playing. Goodbye!")
+            return
 
 def play_game(word, max_tries):
-    guessed_letters = []
+    guessed_letters: List[str] = []
     tries_left = max_tries
     mistakes = 0
 
@@ -249,12 +253,12 @@ def play_game(word, max_tries):
         showStickman(cur_guesses)
 
         guess = input("Your guess: ")
-        guess = char_to_upper(guess)  # Convert guess to uppercase
+        guess = input_to_upper(guess)  # Convert guess to uppercase
 
         valid_guess = False
-        for letter in alphabet_upper:
-            if guess == letter:
-                valid_guess = True
+        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            valid_guess = guess == letter
+            if valid_guess:
                 break
 
         if not valid_guess or len(guess) != 1:
@@ -263,8 +267,8 @@ def play_game(word, max_tries):
 
         already_guessed = False
         for guessed in guessed_letters:
-            if guess == guessed:
-                already_guessed = True
+            already_guessed = guess == guessed
+            if already_guessed:
                 break
 
         if not already_guessed:
@@ -272,8 +276,8 @@ def play_game(word, max_tries):
 
             guess_in_word = False
             for char in word:
-                if guess == char:
-                    guess_in_word = True
+                guess_in_word = guess == char
+                if guess_in_word:
                     break
 
             if not guess_in_word:
@@ -292,8 +296,8 @@ def play_game(word, max_tries):
             if letter != " ":
                 letter_found = False
                 for guessed_letter in guessed_letters:
-                    if letter == guessed_letter:
-                        letter_found = True
+                    letter_found = letter == guessed_letter
+                    if letter_found:
                         break
                 if not letter_found:
                     all_guessed = False
@@ -309,35 +313,6 @@ def play_game(word, max_tries):
         showStickman(6)  # Display full stickman
     else:
         showStickman(cur_guesses)  # Display stickman according to remaining guesses
-
-def main(word=None, max_tries=None):
-    if not word or not max_tries:  # If no word or max_tries provided, initialize game
-        print("LET'S PLAY HANGMAN!\n")
-        word = get_word_choice() if not word else word
-        max_tries = set_number_of_guesses() if not max_tries else max_tries
-    
-    play_game(word, max_tries)
-
-    # Ask to play again with the same word
-    play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
-    while not validate_choice(play_again, ["YES", "NO"]):
-        print("Please enter a valid option (Yes/No).")
-        play_again = input_to_upper(input("Play again with the same word? (Yes/No): "))
-
-    if play_again == "YES":
-        main(word, max_tries)  # Replay with the same word and max_tries
-    else:  # If not replaying with the same word, ask to start a new game
-        start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
-        while not validate_choice(start_new_game, ["YES", "NO"]):
-            print("Please enter a valid option.")
-            start_new_game = input_to_upper(input("Start a new game? (Yes/No): "))
-            
-        if start_new_game == "YES":
-            main()  # Start a completely new game
-        elif start_new_game == "NO":
-            print("Thank you for playing. Goodbye!")
-            return  # Exit the game
-
 # Ensure entry point starts with no word or max_tries set
 if __name__ == "__main__":
     main()
